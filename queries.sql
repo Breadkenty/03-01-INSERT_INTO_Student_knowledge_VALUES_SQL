@@ -73,9 +73,10 @@ INSERT INTO "Employees"
 VALUES
   ('Cody Banks', '(727) 201-2022', 5833.00, 'Software Developer', 'true');
 
--- Views the Employee table and all of the columns
+-- Views the Employee table and all of the columns ** FIXED
 SELECT *
-FROM "Employees";
+FROM "Employees"
+WHERE "IsPartTime" = 'false';
 
 -- Some explorer mode stuff to navigate around the data
 SELECT "FullName", "PhoneExtension"
@@ -103,29 +104,80 @@ CREATE TABLE "Departments"
 (
   "Id" SERIAL PRIMARY KEY,
   "Name" TEXT NOT NULL,
-  "BuildingNumber" INT
+  "Building" TEXT
 );
-
--- Adds some data to work with
-INSERT INTO "Departments"
-  ("Name", "BuildingNumber")
-VALUES
-  ('Information Technology', '51');
-
-INSERT INTO "Departments"
-  ("Name", "BuildingNumber")
-VALUES
-  ('Marketing', '55');
-
-INSERT INTO "Departments"
-  ("Name", "BuildingNumber")
-VALUES
-  ('Customer Service', '58');
 
 -- Add a new column to Employee called DepartmentId. This column will reference the department table we made
 ALTER TABLE "Employees"
 ADD COLUMN "DepartmentId" INTEGER NULL REFERENCES "Departments"
 ("Id");
+
+CREATE TABLE "Products"
+(
+  "Id" SERIAL PRIMARY KEY,
+  "Price" DOUBLE PRECISION,
+  "Name" TEXT,
+  "Description" TEXT,
+  "QuantityInStock" INTEGER
+)
+
+CREATE TABLE "Orders"
+(
+  "Id" SERIAL PRIMARY KEY,
+  "OrderNumber" TEXT,
+  "DatePlaced" TIMESTAMP,
+  "Email" TEXT
+)
+
+CREATE TABLE "ProductOrders"
+(
+  "ID" SERIAL PRIMARY KEY,
+  "OrderQuantity" INT,
+  "OrderId" INT REFERENCES "Orders" ("Id"),
+  "ProductId" INT REFERENCES "Products" ("Id")
+)
+
+-- Adds some data to Departments
+INSERT INTO "Departments"
+  ("Name", "Building")
+VALUES
+  ('Information Technology', 'South East');
+
+INSERT INTO "Departments"
+  ("Name", "Eckerd Hall")
+VALUES
+  ('Marketing', '55');
+
+INSERT INTO "Departments"
+  ("Name", "Student Center")
+VALUES
+  ('Customer Service', '58');
+
+INSERT INTO "Departments"
+  ("Name", "Building")
+VALUES
+  ('Development', 'Main');
+
+INSERT INTO "Departments"
+  ("Name", "Building")
+VALUES
+  ('Marketing', 'North');
+
+-- Adds some data to Employees
+INSERT INTO "Employees"
+  ("FullName", "PhoneNumber", "PhoneExtension", "Salary", "JobPosition", "IsPartTime", "DepartmentId")
+VALUES
+  ('Tim Smith', '(727) 201-2030', '123', 40000, 'Programmer', 'false', 4);
+
+INSERT INTO "Employees"
+  ("FullName", "PhoneNumber", "PhoneExtension", "Salary", "JobPosition", "IsPartTime", "DepartmentId")
+VALUES
+  ('Barbara Ramsay', '(727) 201-2031', '234', 80000, 'Manager', 'false', 4);
+
+INSERT INTO "Employees"
+  ("FullName", "PhoneNumber", "PhoneExtension", "Salary", "JobPosition", "IsPartTime", "DepartmentId")
+VALUES
+  ('Tom Jones', '(727) 201-2032', '456', 32000, 'Admin', 'true', 5);
 
 -- Assigns some elements in the Employee table to the appropriate DepartmentID
 UPDATE "Employees" SET "DepartmentId" = 1 WHERE "Id" IN  (2, 4, 5, 7, 9, 10, 11);
@@ -134,10 +186,65 @@ UPDATE "Employees" SET "DepartmentId" = 3 WHERE "Id" IN  (1, 8);
 
 -- View the joined tables
 select *
-from "Employees" join "Departments" on "Employees"."DepartmentId" = "Departments"."Id"; 
+from "Employees" join "Departments" on "Employees"."DepartmentId" = "Departments"."Id";
 
+-- Adds some data to Products
+INSERT INTO "Products"
+  ("Price", "Name", "Description", "QuantityInStock")
+VALUES
+  (12.45, "Widget", "The Original Widget", 100);
 
+INSERT INTO "Products"
+  ("Price", "Name", "Description", "QuantityInStock")
+VALUES
+  (99.99, 'Flowbee', 'Perfect for haircuts', 3);
 
+-- Add a data to Orders
+INSERT INTO "Orders"
+  ("OrderNumber", "DatePlaced", "Email")
+VALUES
+  ('X529', '01-01-2020 16:55:00', 'person@example.com');
 
+-- Adds a Product Order
+INSERT INTO "ProductOrders"
+  ("OrderQuantity", "OrderId", "ProductId")
+VALUES
+  (3, 1, 1);
+
+INSERT INTO "ProductOrders"
+  ("OrderQuantity", "OrderId", "ProductId")
+VALUES
+  (2, 1, 2);
+
+-- Show all employees by their DepartmentId
+SELECT "Employees"."FullName", "Employees"."Salary", "Employees"."JobPosition", "Employees"."IsPartTime", "Departments"."Name", "Departments"."Building"
+FROM "Employees"
+  JOIN "Departments" ON "Employees"."DepartmentId" = "Departments"."Id"
+WHERE "DepartmentId" = 4;
+
+SELECT "Employees"."FullName", "Employees"."Salary", "Employees"."JobPosition", "Employees"."IsPartTime", "Departments"."Name", "Departments"."Building"
+FROM "Employees"
+  JOIN "Departments" ON "Employees"."DepartmentId" = "Departments"."Id"
+WHERE "DepartmentId" = 5;
+
+-- All employees phone extensions by their given Department Name
+SELECT "Employees"."FullName", "Employees"."PhoneExtension", "Departments"."Name", "Departments"."Building"
+FROM "Employees"
+  JOIN "Departments" ON "Employees"."DepartmentId" = "Departments"."Id"
+WHERE "Departments"."Name" = 'Marketing';
+
+-- Finds all orders that contain the ProductId of 2
+SELECT "Orders"."OrderNumber"
+FROM "Orders"
+  JOIN "ProductOrders" ON "ProductOrders"."OrderId" = "Orders"."Id"
+Where "ProductOrders"."ProductId" = 2;
+
+-- OrderId:1 OrderNumber; X529
+-- ProducId:2 ProductName: FlowBee
+-- Deletes a Product Order where the product is FlowBee and Order Number is X529
+DELETE
+FROM "ProductOrders"
+Where "ProductOrders"."ProductId" = 2
+  And "ProductOrders"."OrderId" = 1;
 
 
