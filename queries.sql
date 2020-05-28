@@ -3,13 +3,13 @@ createdb CompanyDatabase
 -- Creates the table "Employee"
 CREATE TABLE "Employees"
 (
-  "Id" SERIAL PRIMARY KEY
+  "Id" SERIAL PRIMARY KEY,
   "FullName" TEXT NOT NULL,
   "PhoneNumber" VARCHAR(15) NOT NULL,
-  "PhoneExtension" varChar(3),
+  "PhoneExtension" VARCHAR(3),
   "Salary" DECIMAL,
   "JobPosition" TEXT,
-  "IsPartTime" BOOLEAN NOT NULL,
+  "IsPartTime" BOOLEAN NOT NULL
 );
 
 -- Inserts some data to work with
@@ -119,7 +119,7 @@ CREATE TABLE "Products"
   "Name" TEXT,
   "Description" TEXT,
   "QuantityInStock" INTEGER
-)
+);
 
 CREATE TABLE "Orders"
 (
@@ -127,7 +127,7 @@ CREATE TABLE "Orders"
   "OrderNumber" TEXT,
   "DatePlaced" TIMESTAMP,
   "Email" TEXT
-)
+);
 
 CREATE TABLE "ProductOrders"
 (
@@ -135,7 +135,7 @@ CREATE TABLE "ProductOrders"
   "OrderQuantity" INT,
   "OrderId" INT REFERENCES "Orders" ("Id"),
   "ProductId" INT REFERENCES "Products" ("Id")
-)
+);
 
 -- Adds some data to Departments
 INSERT INTO "Departments"
@@ -144,14 +144,14 @@ VALUES
   ('Information Technology', 'South East');
 
 INSERT INTO "Departments"
-  ("Name", "Eckerd Hall")
+  ("Name", "Building")
 VALUES
-  ('Marketing', '55');
+  ('Accounting', 'Eckerd Hall');
 
 INSERT INTO "Departments"
-  ("Name", "Student Center")
+  ("Name", "Building")
 VALUES
-  ('Customer Service', '58');
+  ('Customer Service', 'Student Center');
 
 INSERT INTO "Departments"
   ("Name", "Building")
@@ -192,7 +192,7 @@ from "Employees" join "Departments" on "Employees"."DepartmentId" = "Departments
 INSERT INTO "Products"
   ("Price", "Name", "Description", "QuantityInStock")
 VALUES
-  (12.45, "Widget", "The Original Widget", 100);
+  (12.45, 'Widget', 'The Original Widget', 100);
 
 INSERT INTO "Products"
   ("Price", "Name", "Description", "QuantityInStock")
@@ -231,7 +231,7 @@ WHERE "DepartmentId" = 5;
 SELECT "Employees"."FullName", "Employees"."PhoneExtension", "Departments"."Name", "Departments"."Building"
 FROM "Employees"
   JOIN "Departments" ON "Employees"."DepartmentId" = "Departments"."Id"
-WHERE "Departments"."Name" = 'Marketing';
+WHERE "Departments"."Name" = 'Customer Service';
 
 -- Finds all orders that contain the ProductId of 2
 SELECT "Orders"."OrderNumber"
